@@ -1,13 +1,9 @@
-import { SafeAreaView, Text, StatusBar } from "react-native";
-
+import { Text, StatusBar, Platform } from "react-native";
+import { SafeAreaView } from "@/components/";
 export default function Index() {
   return (
-    <SafeAreaView
-      style={{
-        flex: 1,
-      }}
-    >
-      <StatusBar barStyle="default" />
+    <SafeAreaView>
+      <StatusBar barStyle="dark-content" />
       <Text>Hello Blind Wallet</Text>
     </SafeAreaView>
   );
