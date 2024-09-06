@@ -8,27 +8,50 @@ import {
   generateAuthSig,
 } from "@lit-protocol/auth-helpers";
 import { LocalStorage } from "node-localstorage";
+import dotenv from 'dotenv'
+
+dotenv.config();
 
 const litNodeClient = new LitNodeClient({
   litNetwork: LitNetwork.DatilDev,
-  debug: false
+  debug: false,
+  storageProvider: {
+    provider: new LocalStorage("./lit_storage.db"),
+}
 });
 await litNodeClient.connect();
 
-console.log(LIT_RPC.CHRONICLE_YELLOWSTONE);  // undefined değil ancak sorun çıkarıyor
-
 
 const ethersWallet = new ethers.Wallet(
-  process.env.ETHEREUM_PRIVATE_KEY, // Replace with your private key
+  process.env.ETHEREUM_PRIVATE_KEY, 
   new ethers.providers.JsonRpcProvider(LIT_RPC.CHRONICLE_YELLOWSTONE)
 );
+
+
+const accessControlConditions = [
+  {
+    contractAddress: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
+    standardContractType: 'ERC20',
+    chain: "ethereum",
+    method: 'balanceOf',
+    parameters: [
+      ':userAddress'
+    ],
+    returnValueTest: {
+      comparator: '>',
+      value: 10 // bunu nasıl belirteceğim hocam
+    }
+  }
+]
+
+const accessControlResource= accessControlConditions.toString()
 
 const sessionSignatures = await litNodeClient.getSessionSigs({
   chain: "ethereum",
   expiration: new Date(Date.now() + 1000 * 60 * 10).toISOString(), // 10 minutes
   resourceAbilityRequests: [
     {
-      resource: new LitActionResource("*"),
+      resource: new LitActionResource(accessControlResource), //conditionlar string olarak atanır
       ability: LitAbility.LitActionExecution,
     },
   ],
@@ -53,6 +76,10 @@ const sessionSignatures = await litNodeClient.getSessionSigs({
   },
 });
 
+// buraya kadar authsign ve sessision signature üretildi, actionları execute etmek için bu ikisi gerekli
+//bundan sonra bool olmasına göre gerekli action code imzalanacak
+
+
 const _approveContractlitActionCode = async () => {
   //
 }
@@ -70,7 +97,7 @@ const approveUserlitActionCode = `(${_approveUserlitActionCode.toString()})();`;
 
 
 
-
+await litNodeClient.disconnect();
 
 
 
@@ -122,24 +149,8 @@ app.locals.litNodeClient = new LitJsSdk.LitNodeClientNodeJs({
   alertWhenUnauthorized: false,
   litNetwork: LitNetwork.Datil,
 });
-await app.locals.litNodeClient.connect();
+await app.locals.litNodeClient.connect();*/
 
 
 
 
-const accessControlConditions = [
-    {
-      contractAddress: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
-      standardContractType: 'ERC20',
-      chain,
-      method: 'balanceOf',
-      parameters: [
-        ':userAddress'
-      ],
-      returnValueTest: {
-        comparator: '>',
-        value: sendAmount
-      }
-    }
-  ]*/
-  
