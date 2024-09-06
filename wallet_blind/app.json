@@ -1,4 +1,5 @@
 {
   "name": "wallet_blind",
-  "displayName": "wallet_blind"
+  "slug": "wallet_blind",
+  "version": "1.0.0"
 }
