@@ -53,10 +53,41 @@ const sessionSignatures = await litNodeClient.getSessionSigs({
   },
 });
 
+const _approveContractlitActionCode = async () => {
+  //
+}
+
+
+const approveContractlitActionCode = `(${_approveContractlitActionCode.toString()})();`;
+
+const _approveUserlitActionCode = async () => {
+  //
+}
+
+
+const approveUserlitActionCode = `(${_approveUserlitActionCode.toString()})();`;
 
 
 
 
+
+
+
+
+
+
+
+
+
+
+/*const response = await litNodeClient.executeJs({
+  sessionSigs: sessionSignatures,
+  code: litActionCode,
+  jsParams: {
+    receiver: "sdfsdf",
+    amount: 1
+  }
+});  execution için hepsine ayrı yazılacak
 
 
 
