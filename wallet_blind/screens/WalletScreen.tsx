@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {View, Text, TouchableOpacity, StyleSheet} from 'react-native';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {RootStackParamList} from '../App';
@@ -6,7 +6,7 @@ import {SafeAreaView} from 'react-native-safe-area-context';
 import {useSpeak} from '../hooks/useSpeak';
 import {useColorScheme} from 'react-native';
 import {useBalance} from '../context/BalanceContext';
-import ReactNativeHapticFeedback from 'react-native-haptic-feedback'; // Haptic feedback importu
+import ReactNativeHapticFeedback from 'react-native-haptic-feedback';
 
 const options = {
   enableVibrateFallback: true,
@@ -16,7 +16,7 @@ const options = {
 type WalletScreenProps = NativeStackScreenProps<RootStackParamList, 'Wallet'>;
 
 const WalletScreen: React.FC<WalletScreenProps> = ({navigation}) => {
-  const [menuVisible, setMenuVisible] = useState(false);
+  //const [menuVisible, setMenuVisible] = useState(false);
   const {speak} = useSpeak();
   const colorScheme = useColorScheme();
   const isDarkMode = colorScheme === 'dark';
@@ -25,8 +25,12 @@ const WalletScreen: React.FC<WalletScreenProps> = ({navigation}) => {
 
   const handlePress = (message: string) => {
     speak(message);
-    ReactNativeHapticFeedback.trigger('impactHeavy', options); // Titreşim geri bildirimi
+    ReactNativeHapticFeedback.trigger('impactHeavy', options);
   };
+
+  useEffect(() => {
+    navigation.navigate('SendMoney', {});
+  }, [navigation]);
 
   return (
     <SafeAreaView
@@ -37,20 +41,20 @@ const WalletScreen: React.FC<WalletScreenProps> = ({navigation}) => {
       <View style={styles.header}>
         <TouchableOpacity
           onPress={() => setMenuVisible(true)}
-          onLongPress={() => handlePress('Blind-Wallet')}>
+          onLongPress={() => handlePress('Domino Wallet')}>
           <Text
             style={[styles.logo, {color: isDarkMode ? '#FFFFFF' : '#000000'}]}>
-            domino
+            Domino
           </Text>
         </TouchableOpacity>
-        <TouchableOpacity
+        {/*<TouchableOpacity
           onPress={() => setMenuVisible(true)}
           onLongPress={() => handlePress('Menu')}>
           <Text
             style={[styles.menu, {color: isDarkMode ? '#FFFFFF' : '#000000'}]}>
             Menu
           </Text>
-        </TouchableOpacity>
+        </TouchableOpacity>*/}
       </View>
 
       <View style={styles.networkContainer}>
@@ -103,6 +107,7 @@ const WalletScreen: React.FC<WalletScreenProps> = ({navigation}) => {
           onLongPress={() => handlePress('Deposit')}>
           <Text style={styles.buttonText}>DEPOSIT +</Text>
         </TouchableOpacity>
+
         <TouchableOpacity
           style={[styles.button, styles.requestButton]}
           onPress={() => console.log('Request Pressed')}
@@ -198,6 +203,9 @@ const styles = StyleSheet.create({
   },
   depositButton: {
     backgroundColor: '#000000',
+  },
+  sendButton: {
+    backgroundColor: '#0000FF', // Send butonu için farklı renk
   },
   requestButton: {
     backgroundColor: '#FFFFFF',

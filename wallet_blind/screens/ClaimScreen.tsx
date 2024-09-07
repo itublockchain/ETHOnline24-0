@@ -5,16 +5,17 @@ import {
   TouchableOpacity,
   TextInput,
   StyleSheet,
+  ActivityIndicator,
+  Animated,
 } from 'react-native';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {RootStackParamList} from '../App';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {useBalance} from '../context/BalanceContext';
 import {useSpeak} from '../hooks/useSpeak';
-import HapticFeedback from 'react-native-haptic-feedback'; // Haptic Feedback import edildi
-import {MMKV} from 'react-native-mmkv'; // MMKV import edildi
+import HapticFeedback from 'react-native-haptic-feedback';
+import {MMKV} from 'react-native-mmkv';
 
-// MMKV depolama oluşturuluyor
 const storage = new MMKV();
 
 type ClaimScreenProps = NativeStackScreenProps<RootStackParamList, 'Claim'>;
@@ -24,29 +25,47 @@ const ClaimScreen: React.FC<ClaimScreenProps> = ({route, navigation}) => {
   const {updateBalance} = useBalance();
   const {speak} = useSpeak();
 
-  // Uygulama ilk açıldığında oluşturulan private key'i burada tutuyoruz
-  const [privateKey, setPrivateKey] = useState<string>('');
-
+  const [walletAddress, setWalletAddress] = useState<string>('');
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [isClaimed, setIsClaimed] = useState(false);
+  const [isEditable, setIsEditable] = useState(true);
+  const [fadeAnim] = useState(new Animated.Value(0));
   useEffect(() => {
-    // App.tsx'de oluşturulmuş olan private key'i MMKV'den alıyoruz
-    const storedPrivateKey = storage.getString('privateKey');
-    if (storedPrivateKey) {
-      setPrivateKey(storedPrivateKey); // Private key'i state'e kaydediyoruz
+    const storedWalletAddress = storage.getString('walletAddress');
+    if (storedWalletAddress) {
+      setWalletAddress(storedWalletAddress);
     }
   }, []);
 
   const handleClaim = () => {
+    setIsProcessing(true);
+    setIsEditable(false);
     const claimAmount = parseFloat(amount as any);
     if (!isNaN(claimAmount)) {
       updateBalance(claimAmount);
     }
-    navigation.navigate('ClaimSuccess', {amount: claimAmount});
+
+    setTimeout(() => {
+      setIsProcessing(false);
+      setIsClaimed(true);
+      const message = `Successfully claimed ${claimAmount} dollars!`;
+      handleVibrateAndSpeak(message);
+
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 1000,
+        useNativeDriver: true,
+      }).start();
+
+      setTimeout(() => {
+        navigation.navigate('Wallet');
+      }, 3000);
+    }, 7000);
   };
 
-  // Haptic Feedback ve Sesli Geri Bildirim
   const handleVibrateAndSpeak = (message: string) => {
-    HapticFeedback.trigger('impactLight'); // Haptic feedback tetikleniyor
-    speak(message); // Sesli geri bildirim
+    HapticFeedback.trigger('impactLight');
+    speak(message);
   };
 
   return (
@@ -62,9 +81,10 @@ const ClaimScreen: React.FC<ClaimScreenProps> = ({route, navigation}) => {
           placeholder="Your Wallet Address"
           placeholderTextColor="#999"
           style={styles.input}
-          value={privateKey} // App.tsx'deki private key burada gösteriliyor
-          editable={false} // Kullanıcı tarafından düzenlenemeyecek
-          onFocus={() => speak(`Your Wallet Address is ${privateKey}`)} // Sesli geri bildirim
+          value={walletAddress}
+          onChangeText={setWalletAddress}
+          editable={isEditable}
+          onFocus={() => speak(`Your Wallet Address is ${walletAddress}`)}
         />
       </View>
 
@@ -81,12 +101,24 @@ const ClaimScreen: React.FC<ClaimScreenProps> = ({route, navigation}) => {
         </Text>
       </View>
 
-      <TouchableOpacity
-        style={styles.claimButton}
-        onPress={handleClaim}
-        onLongPress={() => handleVibrateAndSpeak('Claim')}>
-        <Text style={styles.claimButtonText}>CLAIM</Text>
-      </TouchableOpacity>
+      {isProcessing ? (
+        <ActivityIndicator size="large" color="#0000ff" />
+      ) : (
+        <TouchableOpacity
+          style={styles.claimButton}
+          onPress={handleClaim}
+          onLongPress={() => handleVibrateAndSpeak('Claim')}>
+          <Text style={styles.claimButtonText}>CLAIM</Text>
+        </TouchableOpacity>
+      )}
+
+      {isClaimed && (
+        <Animated.View style={[styles.successMessage, {opacity: fadeAnim}]}>
+          <Text style={styles.successText}>
+            Successfully claimed {amount} dollars!
+          </Text>
+        </Animated.View>
+      )}
     </SafeAreaView>
   );
 };
@@ -134,6 +166,15 @@ const styles = StyleSheet.create({
     color: '#FFF',
     fontSize: 18,
     fontWeight: 'bold',
+  },
+  successMessage: {
+    marginTop: 20,
+    alignItems: 'center',
+  },
+  successText: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#008000',
   },
 });
 

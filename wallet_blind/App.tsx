@@ -1,7 +1,9 @@
 import React, {useEffect, useRef} from 'react';
 import {MMKV} from 'react-native-mmkv';
-import 'react-native-get-random-values'; // Rastgele değerler için
-import {v4 as uuidv4} from 'uuid'; // UUID ile unique değer oluşturma
+import 'react-native-get-random-values';
+import '@ethersproject/shims';
+import {ethers} from 'ethers';
+import {Linking} from 'react-native';
 import {
   NavigationContainer,
   NavigationContainerRef,
@@ -11,16 +13,17 @@ import {
   ClaimScreen,
   ActivityScreen,
   ClaimSuccessScreen,
+  SendMoneyScreen,
 } from './screens/index';
 import {BalanceProvider} from './context/BalanceContext';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
-import {Linking} from 'react-native'; // React Native'den doğru Linking importu
 
 export type RootStackParamList = {
   Wallet: undefined;
   Activity: undefined;
   Claim: {amount: number};
   ClaimSuccess: {amount: number};
+  SendMoney: {recipient: string};
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -34,24 +37,21 @@ const linking = {
   },
 };
 
-// MMKV depolama
 const storage = new MMKV();
 
 const App: React.FC = () => {
   const navigationRef =
     useRef<NavigationContainerRef<RootStackParamList>>(null);
 
-  // Uygulama açıldığında bir private key oluşturma ve kaydetme
   useEffect(() => {
-    const existingPrivateKey = storage.getString('privateKey');
-
-    // Eğer private key yoksa oluştur ve sakla
+    const existingPrivateKey = storage.getString('walletAddress');
     if (!existingPrivateKey) {
-      const newPrivateKey = uuidv4(); // Rastgele bir private key oluştur
-      storage.set('privateKey', newPrivateKey);
-      console.log('New Private Key Generated:', newPrivateKey);
+      const wallet = ethers.Wallet.createRandom();
+      const newWalletAddress = wallet.address;
+      storage.set('walletAddress', newWalletAddress);
+      console.log('New Wallet Address Generated:', newWalletAddress);
     } else {
-      console.log('Private Key Already Exists:', existingPrivateKey);
+      console.log('Wallet Address Already Exists:', existingPrivateKey);
     }
   }, []);
 
@@ -66,10 +66,8 @@ const App: React.FC = () => {
       }
     };
 
-    // React Native Linking API'sini kullanarak deep link event handler'ı ekliyoruz
-    const linkingSubscription = Linking.addEventListener('url', handleDeepLink);
+    const linkingSubscription = Linking.addListener('url', handleDeepLink);
 
-    // Uygulama ilk açıldığında deep link ile başlatıldıysa URL'yi alıyoruz
     Linking.getInitialURL().then(url => {
       if (url && url.startsWith('myapp://claim')) {
         const amount = url.split('/')[2];
@@ -79,7 +77,6 @@ const App: React.FC = () => {
       }
     });
 
-    // Component kaldırılırken event handler'ı temizliyoruz
     return () => {
       linkingSubscription.remove();
     };
@@ -95,6 +92,7 @@ const App: React.FC = () => {
           <Stack.Screen name="Activity" component={ActivityScreen} />
           <Stack.Screen name="Claim" component={ClaimScreen} />
           <Stack.Screen name="ClaimSuccess" component={ClaimSuccessScreen} />
+          <Stack.Screen name="SendMoney" component={SendMoneyScreen} />
         </Stack.Navigator>
       </NavigationContainer>
     </BalanceProvider>
