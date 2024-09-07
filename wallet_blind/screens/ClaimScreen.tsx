@@ -21,7 +21,7 @@ const storage = new MMKV();
 type ClaimScreenProps = NativeStackScreenProps<RootStackParamList, 'Claim'>;
 
 const ClaimScreen: React.FC<ClaimScreenProps> = ({route, navigation}) => {
-  const {amount} = route.params; // Gelen parametre string olabilir
+  const {amount} = route.params;
   const {updateBalance} = useBalance();
   const {speak} = useSpeak();
 
@@ -95,7 +95,6 @@ const ClaimScreen: React.FC<ClaimScreenProps> = ({route, navigation}) => {
           value={walletAddress}
           onChangeText={setWalletAddress}
           editable={isEditable}
-          onFocus={() => speak(`Your Wallet Address is ${walletAddress}`)}
         />
       </View>
 
@@ -138,7 +137,7 @@ const ClaimScreen: React.FC<ClaimScreenProps> = ({route, navigation}) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#5F259F',
+    backgroundColor: '#632CA9',
     padding: 20,
   },
   header: {

@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useEffect} from 'react';
 import {View, Text, TouchableOpacity, StyleSheet, Image} from 'react-native';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {RootStackParamList} from '../App';
@@ -7,6 +7,7 @@ import {useSpeak} from '../hooks/useSpeak';
 import {useColorScheme} from 'react-native';
 import {useBalance} from '../context/BalanceContext';
 import ReactNativeHapticFeedback from 'react-native-haptic-feedback';
+import {useActiveTab} from '../hooks/useActiveTab';
 
 const options = {
   enableVibrateFallback: true,
@@ -19,7 +20,7 @@ const WalletScreen: React.FC<WalletScreenProps> = ({navigation}) => {
   const {speak} = useSpeak();
   const colorScheme = useColorScheme();
   const isDarkMode = colorScheme === 'dark';
-  const [activeTab, setActiveTab] = useState<'Wallet' | 'Activity'>('Wallet');
+  const {activeTab, switchTab} = useActiveTab();
   const {balance} = useBalance();
 
   const handlePress = (message: string) => {
@@ -28,11 +29,11 @@ const WalletScreen: React.FC<WalletScreenProps> = ({navigation}) => {
   };
 
   useEffect(() => {
-    navigation.navigate('SendMoney', {});
+    //navigation.navigate('SendMoney', {});
   }, [navigation]);
 
   return (
-    <SafeAreaView style={[styles.container, {backgroundColor: '#5F259F'}]}>
+    <SafeAreaView style={[styles.container, {backgroundColor: '#632CA9'}]}>
       <View style={styles.header}>
         <Image
           source={require('../assets/logo.jpeg')}
@@ -53,7 +54,7 @@ const WalletScreen: React.FC<WalletScreenProps> = ({navigation}) => {
       {/* Sekme menüsü */}
       <View style={styles.tabContainer}>
         <TouchableOpacity
-          onPress={() => setActiveTab('Wallet')}
+          onPress={() => switchTab('Wallet')}
           onLongPress={() => handlePress('Wallet')}
           style={[
             styles.tabButton,
@@ -69,7 +70,7 @@ const WalletScreen: React.FC<WalletScreenProps> = ({navigation}) => {
         </TouchableOpacity>
 
         <TouchableOpacity
-          onPress={() => setActiveTab('Activity')}
+          onPress={() => switchTab('Activity')}
           onLongPress={() => handlePress('Activity')}
           style={[
             styles.tabButton,
@@ -106,11 +107,11 @@ const WalletScreen: React.FC<WalletScreenProps> = ({navigation}) => {
       ) : (
         <View style={styles.activityContainer}>
           <Text style={styles.activityText}>Transaction History</Text>
-          <Text style={styles.transactionText}>→ $20</Text>
-          <Text style={styles.transactionText}>← $25</Text>
-          <Text style={styles.transactionText}>→ $35</Text>
-          <Text style={styles.transactionText}>← $5</Text>
-          <Text style={styles.transactionText}>← $50</Text>
+          <Text style={styles.transactionText}>↗ $20</Text>
+          <Text style={styles.transactionText}>↙ $25</Text>
+          <Text style={styles.transactionText}>↗ $35</Text>
+          <Text style={styles.transactionText}>↙ $5</Text>
+          <Text style={styles.transactionText}>↙ $50</Text>
         </View>
       )}
 
@@ -129,9 +130,9 @@ const WalletScreen: React.FC<WalletScreenProps> = ({navigation}) => {
         </TouchableOpacity>
 
         <TouchableOpacity
-          style={styles.requestButton}
-          onLongPress={() => handlePress('Request money')}>
-          <Text style={styles.buttonText}>REQUEST -</Text>
+          style={styles.withdrawButton}
+          onLongPress={() => handlePress('Withdraw money')}>
+          <Text style={styles.buttonText}>Withdraw -</Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>
@@ -220,8 +221,9 @@ const styles = StyleSheet.create({
   },
   activityContainer: {
     flex: 1,
-
-    alignItems: 'center',
+    marginTop: 50,
+    //backgroundColor: '#FFFF00',
+    alignItems: 'start',
   },
   activityText: {
     fontSize: 24,
@@ -254,7 +256,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     height: 200,
   },
-  requestButton: {
+  withdrawButton: {
     flex: 1,
     backgroundColor: '#FFF',
     borderRadius: 15,
