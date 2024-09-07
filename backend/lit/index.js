@@ -40,20 +40,8 @@ async function main() {//connect to lit node
   );
   
   const { abi: walletAbi, bytecode: walletBytecode } = walletC;
-  const { abi: tokenAbi, bytecode: tokenBytecode } = tokenC;/*
-  //doeploy necessary contracts
-  const Token= new ethers.ContractFactory(tokenAbi,tokenBytecode,ethersWallet);
-  const token= await Token.connect(ethersWallet).deploy("USDC","USDC");
-  
-  
-  const Wallet= new ethers.ContractFactory(walletAbi,walletBytecode,ethersWallet);
-  const wallet= await Wallet.connect(ethersWallet).deploy(token.address);*/
-  
-  
-  
-  
-  
-  
+  const { abi: tokenAbi, bytecode: tokenBytecode } = tokenC;
+
   try {const accessControlConditions = [
     {
       contractAddress: tokenAddress,
@@ -72,16 +60,6 @@ async function main() {//connect to lit node
   
   const accessControlResource= accessControlConditions.toString()
 
-  // Create the session capability object
-/*const sessionCapabilityObject = new SessionCapabilityObject();
-
-// Create the Lit Resource keyed by `someResource`
-const litResource = new LitAccessControlConditionResource(accessControlResource);
-
-// Add all capabilities that are valid and relevant to the specified lit resource.
-sessionCapabilityObject.addAllCapabilitiesForResource(litResource);
-  
- /* ;*/
 
   try {
     const sessionSignatures = await litNodeClient.getSessionSigs({
@@ -157,7 +135,7 @@ sessionCapabilityObject.addAllCapabilitiesForResource(litResource);
   
       //const send= await token.connect(ethersWallet).transferFrom(ethersWallet.address,receiver,amount);
       const sigShare = await LitActions.signEcdsa({
-        toSign: send,
+        toSign: sent,
         publicKey,
         sigName: "sendSig",
       });
