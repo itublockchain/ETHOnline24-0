@@ -1,12 +1,13 @@
 import { LitNodeClient } from "@lit-protocol/lit-node-client";
 import { LitNetwork, LIT_RPC } from "@lit-protocol/constants";
+
 import * as ethers from "ethers";
 import {
   LitAbility,
   LitActionResource,
   createSiweMessage,
   generateAuthSig,
-  LitRLIResource
+  LitPKPResource
 
 } from "@lit-protocol/auth-helpers";
 import { LocalStorage } from "node-localstorage";
@@ -23,7 +24,8 @@ dotenv.config();
 const walletAddress="0xEF43160003bbf15449376D7dc927e0005453a0A2"
 const tokenAddress="0x10Fd43ee3312cA637B7020e475865800cD42726A";
 
-async function main() {//connect to lit node
+async function main() {
+  //connect to lit node
   const litNodeClient = new LitNodeClient({
     litNetwork: LitNetwork.DatilDev,
     debug: false,
@@ -33,14 +35,16 @@ async function main() {//connect to lit node
   });
   await litNodeClient.connect();
   
-  
+  //connect to ethereum
   const ethersWallet = new ethers.Wallet(
     process.env.ETHEREUM_PRIVATE_KEY, 
     new ethers.providers.JsonRpcProvider(LIT_RPC.CHRONICLE_YELLOWSTONE)
   );
   
+  //to create a contract instance
   const { abi: walletAbi, bytecode: walletBytecode } = walletC;
   const { abi: tokenAbi, bytecode: tokenBytecode } = tokenC;
+
 
   try {const accessControlConditions = [
     {
@@ -60,10 +64,21 @@ async function main() {//connect to lit node
   
   const accessControlResource= accessControlConditions.toString()
 
+  const resourceAbilityRequests = [
+    {
+      resource: new LitPKPResource("*"),
+      ability: LitAbility.PKPSigning,
+    },
+    {
+      resource: new LitActionResource("*"),
+      ability: LitAbility.LitActionExecution,
+    },
+   ];
+
 
   try {
-    const sessionSignatures = await litNodeClient.getSessionSigs({
-      chain: "sepolia", //bu yanlış
+    /*const sessionSignatures = await litNodeClient.getSessionSigs({
+      chain: "Sepolia", //bu yanlış
       expiration: new Date(Date.now() + 1000 * 60 * 10).toISOString(), // 10 minutes
       resourceAbilityRequests: [
         {
@@ -90,7 +105,37 @@ async function main() {//connect to lit node
           toSign,
         });
       },
-    })
+    })*/
+      const sessionSignatures = await litNodeClient.getSessionSigs({
+        chain: "ethereum",
+        expiration: new Date(Date.now() + 1000 * 60 * 10 ).toISOString(), // 10 minutes
+        //capabilityAuthSigs: [capacityDelegationAuthSig], // Unnecessary on datil-dev
+        resourceAbilityRequests: [
+          {
+            resource: new LitAccessControlConditionResource("*"),
+            ability: LitAbility.AccessControlConditionDecryption,
+          },
+        ],
+        authNeededCallback: async ({
+          uri,
+          expiration,
+          resourceAbilityRequests,
+        }) => {
+          const toSign = await createSiweMessage({
+            uri,
+            expiration,
+            resources: resourceAbilityRequests,
+            walletAddress: ethersWallet.address,
+            nonce: await litNodeClient.getLatestBlockhash(),
+            litNodeClient,
+          });
+      
+          return await generateAuthSig({
+            signer: ethersWallet,
+            toSign,
+          });
+        },
+      });
   } catch (error) {
     console.error('Error getting session signatures:', error);
   }
