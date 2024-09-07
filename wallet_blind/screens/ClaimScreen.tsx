@@ -21,7 +21,7 @@ const storage = new MMKV();
 type ClaimScreenProps = NativeStackScreenProps<RootStackParamList, 'Claim'>;
 
 const ClaimScreen: React.FC<ClaimScreenProps> = ({route, navigation}) => {
-  const {amount} = route.params;
+  const {amount} = route.params; // Gelen parametre string olabilir
   const {updateBalance} = useBalance();
   const {speak} = useSpeak();
 
@@ -30,6 +30,7 @@ const ClaimScreen: React.FC<ClaimScreenProps> = ({route, navigation}) => {
   const [isClaimed, setIsClaimed] = useState(false);
   const [isEditable, setIsEditable] = useState(true);
   const [fadeAnim] = useState(new Animated.Value(0));
+
   useEffect(() => {
     const storedWalletAddress = storage.getString('walletAddress');
     if (storedWalletAddress) {
@@ -40,10 +41,20 @@ const ClaimScreen: React.FC<ClaimScreenProps> = ({route, navigation}) => {
   const handleClaim = () => {
     setIsProcessing(true);
     setIsEditable(false);
-    const claimAmount = parseFloat(amount as any);
-    if (!isNaN(claimAmount)) {
-      updateBalance(claimAmount);
+
+    // Parametreyi temizle
+    const cleanedAmount = (amount || '').replace(/[^\d.-]/g, '');
+
+    // Temizlenmiş değeri sayıya çevir
+    const claimAmount = parseFloat(cleanedAmount);
+
+    if (isNaN(claimAmount)) {
+      handleVibrateAndSpeak('Invalid amount provided');
+      setIsProcessing(false);
+      return;
     }
+
+    updateBalance(claimAmount); // Bakiyeyi güncelle
 
     setTimeout(() => {
       setIsProcessing(false);
@@ -102,7 +113,7 @@ const ClaimScreen: React.FC<ClaimScreenProps> = ({route, navigation}) => {
       </View>
 
       {isProcessing ? (
-        <ActivityIndicator size="large" color="#0000ff" />
+        <ActivityIndicator size="large" color="#ffffff" />
       ) : (
         <TouchableOpacity
           style={styles.claimButton}
@@ -117,6 +128,7 @@ const ClaimScreen: React.FC<ClaimScreenProps> = ({route, navigation}) => {
           <Text style={styles.successText}>
             Successfully claimed {amount} dollars!
           </Text>
+          <Text style={styles.successText}>✓</Text>
         </Animated.View>
       )}
     </SafeAreaView>
@@ -126,13 +138,14 @@ const ClaimScreen: React.FC<ClaimScreenProps> = ({route, navigation}) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#D8FF00',
+    backgroundColor: '#5F259F',
     padding: 20,
   },
   header: {
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 20,
+    color: '#ffffff',
   },
   inputContainer: {
     marginBottom: 20,
@@ -151,10 +164,12 @@ const styles = StyleSheet.create({
   amountLabel: {
     fontSize: 18,
     fontWeight: 'bold',
+    color: '#ffffff',
   },
   amountValue: {
     fontSize: 18,
     fontWeight: 'bold',
+    color: '#ffffff',
   },
   claimButton: {
     backgroundColor: '#000',
@@ -168,13 +183,14 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   successMessage: {
-    marginTop: 20,
+    marginTop: 30,
     alignItems: 'center',
+    justifyContent: 'center',
   },
   successText: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#008000',
+    color: '#ffffff',
   },
 });
 

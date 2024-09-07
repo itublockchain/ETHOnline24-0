@@ -41,7 +41,7 @@ const SendMoneyScreen: React.FC<SendMoneyScreenProps> = ({navigation}) => {
           const displayName = contactName || phoneNumber;
 
           setSelectedContact(displayName);
-          handleVibrateAndSpeak(`${displayName} is receiving money`);
+          handleVibrateAndSpeak(`You are sending money to ${displayName} `);
         } else {
           handleVibrateAndSpeak('No contacts found');
         }
@@ -78,7 +78,7 @@ const SendMoneyScreen: React.FC<SendMoneyScreenProps> = ({navigation}) => {
   return (
     <SafeAreaView style={styles.container}>
       {/* Spinner */}
-      <ActivityIndicator size="large" color="#0000ff" />
+      <ActivityIndicator size="large" color="#fff" />
 
       {/* Display the status of sending money to the selected contact */}
       <Text style={styles.text}>
@@ -87,7 +87,7 @@ const SendMoneyScreen: React.FC<SendMoneyScreenProps> = ({navigation}) => {
           : 'Selecting contact...'}
       </Text>
 
-      {/* Cancel button */}
+      {/* Cancel button 
       <TouchableOpacity
         style={styles.cancelButton}
         onPress={() => {
@@ -96,7 +96,7 @@ const SendMoneyScreen: React.FC<SendMoneyScreenProps> = ({navigation}) => {
         }}
         onLongPress={() => handleVibrateAndSpeak('Cancel')}>
         <Text style={styles.cancelButtonText}>Cancel</Text>
-      </TouchableOpacity>
+      </TouchableOpacity> */}
     </SafeAreaView>
   );
 };
@@ -106,14 +106,15 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#D8FF00',
+    backgroundColor: '#5F259F',
   },
   text: {
     fontSize: 18,
     fontWeight: 'bold',
     marginTop: 20,
+    color: 'white',
   },
-  cancelButton: {
+  /* cancelButton: {
     marginTop: 30,
     padding: 10,
     backgroundColor: '#FF0000',
@@ -123,7 +124,7 @@ const styles = StyleSheet.create({
     color: '#FFF',
     fontSize: 16,
     fontWeight: 'bold',
-  },
+  },*/
 });
 
 export default SendMoneyScreen;
