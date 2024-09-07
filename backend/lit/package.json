@@ -76,6 +76,7 @@
     "glob-parent": "^5.1.2",
     "gopd": "^1.0.1",
     "h3": "^1.12.0",
+    "hardhat": "^2.22.10",
     "has-property-descriptors": "^1.0.2",
     "has-proto": "^1.0.3",
     "has-symbols": "^1.0.3",
@@ -194,8 +195,8 @@
     "std-env": "^3.7.0",
     "stream-shift": "^1.0.3",
     "strict-uri-encode": "^2.0.0",
-    "string-width": "^4.2.3",
     "string_decoder": "^1.1.1",
+    "string-width": "^4.2.3",
     "strip-ansi": "^6.0.1",
     "strip-final-newline": "^3.0.0",
     "system-architecture": "^0.1.0",
@@ -234,7 +235,6 @@
     "yargs": "^15.4.1",
     "yargs-parser": "^18.1.3"
   },
-  "devDependencies": {},
   "scripts": {
     "test": "node index.js"
   },
