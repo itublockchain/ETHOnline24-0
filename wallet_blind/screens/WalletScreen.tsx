@@ -6,7 +6,12 @@ import {SafeAreaView} from 'react-native-safe-area-context';
 import {useSpeak} from '../hooks/useSpeak';
 import {useColorScheme} from 'react-native';
 import {useBalance} from '../context/BalanceContext';
-import DropdownMenu from '../components/DropDownMenu';
+import ReactNativeHapticFeedback from 'react-native-haptic-feedback'; // Haptic feedback importu
+
+const options = {
+  enableVibrateFallback: true,
+  ignoreAndroidSystemSettings: false,
+};
 
 type WalletScreenProps = NativeStackScreenProps<RootStackParamList, 'Wallet'>;
 
@@ -18,8 +23,9 @@ const WalletScreen: React.FC<WalletScreenProps> = ({navigation}) => {
 
   const {balance} = useBalance();
 
-  const toggleMenu = () => {
-    setMenuVisible(!menuVisible);
+  const handlePress = (message: string) => {
+    speak(message);
+    ReactNativeHapticFeedback.trigger('impactHeavy', options); // Titreşim geri bildirimi
   };
 
   return (
@@ -29,15 +35,17 @@ const WalletScreen: React.FC<WalletScreenProps> = ({navigation}) => {
         {backgroundColor: isDarkMode ? '#000000' : '#D8FF00'},
       ]}>
       <View style={styles.header}>
-        <TouchableOpacity onLongPress={() => speak('Domino-Wallet')}>
+        <TouchableOpacity
+          onPress={() => setMenuVisible(true)}
+          onLongPress={() => handlePress('Blind-Wallet')}>
           <Text
             style={[styles.logo, {color: isDarkMode ? '#FFFFFF' : '#000000'}]}>
-            Domino-Wallet
+            domino
           </Text>
         </TouchableOpacity>
         <TouchableOpacity
-          onPress={toggleMenu}
-          onLongPress={() => speak('Menu')}>
+          onPress={() => setMenuVisible(true)}
+          onLongPress={() => handlePress('Menu')}>
           <Text
             style={[styles.menu, {color: isDarkMode ? '#FFFFFF' : '#000000'}]}>
             Menu
@@ -46,7 +54,7 @@ const WalletScreen: React.FC<WalletScreenProps> = ({navigation}) => {
       </View>
 
       <View style={styles.networkContainer}>
-        <TouchableOpacity onLongPress={() => speak('Mainnet')}>
+        <TouchableOpacity onLongPress={() => handlePress('Mainnet')}>
           <Text
             style={[
               styles.networkText,
@@ -63,13 +71,13 @@ const WalletScreen: React.FC<WalletScreenProps> = ({navigation}) => {
       <View style={styles.tabContainer}>
         <TouchableOpacity
           onPress={() => navigation.navigate('Wallet')}
-          onLongPress={() => speak('Wallet')}
+          onLongPress={() => handlePress('Wallet')}
           style={styles.tabButton}>
           <Text style={[styles.tabText, styles.activeTab]}>Wallet</Text>
         </TouchableOpacity>
         <TouchableOpacity
           onPress={() => navigation.navigate('Activity')}
-          onLongPress={() => speak('Activity')}
+          onLongPress={() => handlePress('Activity')}
           style={styles.tabButton}>
           <Text style={styles.tabText}>Activity</Text>
         </TouchableOpacity>
@@ -78,7 +86,7 @@ const WalletScreen: React.FC<WalletScreenProps> = ({navigation}) => {
       <View style={styles.balanceContainer}>
         <TouchableOpacity
           style={styles.balanceWrapper}
-          onLongPress={() => speak(`Balance: ${balance.toFixed(2)} dollars`)}>
+          onLongPress={() => handlePress(`Balance: ${balance} dollars`)}>
           <Text style={styles.dollarSign}>$</Text>
           <Text style={styles.balanceText}>
             {balance !== undefined && typeof balance === 'number'
@@ -91,23 +99,17 @@ const WalletScreen: React.FC<WalletScreenProps> = ({navigation}) => {
       <View style={styles.buttonContainer}>
         <TouchableOpacity
           style={[styles.button, styles.depositButton]}
-          onPress={() => console.log('Deposit Pressed')} // Depozit işlemi
-          onLongPress={() => speak('Deposit')}>
+          onPress={() => console.log('Deposit Pressed')}
+          onLongPress={() => handlePress('Deposit')}>
           <Text style={styles.buttonText}>DEPOSIT +</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={[styles.button, styles.requestButton]}
-          onPress={() => console.log('Request Pressed')} // Request işlemi
-          onLongPress={() => speak('Request')}>
+          onPress={() => console.log('Request Pressed')}
+          onLongPress={() => handlePress('Request')}>
           <Text style={styles.requestButtonText}>REQUEST +</Text>
         </TouchableOpacity>
       </View>
-
-      {/* DropdownMenu bileşeni */}
-      <DropdownMenu
-        visible={menuVisible}
-        onClose={() => setMenuVisible(false)} // Menüyü kapatma fonksiyonu
-      />
     </SafeAreaView>
   );
 };

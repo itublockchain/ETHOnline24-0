@@ -1,17 +1,21 @@
-import React from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   View,
   Text,
   TouchableOpacity,
   TextInput,
   StyleSheet,
-  TouchableWithoutFeedback,
 } from 'react-native';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {RootStackParamList} from '../App';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {useBalance} from '../context/BalanceContext';
 import {useSpeak} from '../hooks/useSpeak';
+import HapticFeedback from 'react-native-haptic-feedback'; // Haptic Feedback import edildi
+import {MMKV} from 'react-native-mmkv'; // MMKV import edildi
+
+// MMKV depolama oluşturuluyor
+const storage = new MMKV();
 
 type ClaimScreenProps = NativeStackScreenProps<RootStackParamList, 'Claim'>;
 
@@ -19,6 +23,17 @@ const ClaimScreen: React.FC<ClaimScreenProps> = ({route, navigation}) => {
   const {amount} = route.params;
   const {updateBalance} = useBalance();
   const {speak} = useSpeak();
+
+  // Uygulama ilk açıldığında oluşturulan private key'i burada tutuyoruz
+  const [privateKey, setPrivateKey] = useState<string>('');
+
+  useEffect(() => {
+    // App.tsx'de oluşturulmuş olan private key'i MMKV'den alıyoruz
+    const storedPrivateKey = storage.getString('privateKey');
+    if (storedPrivateKey) {
+      setPrivateKey(storedPrivateKey); // Private key'i state'e kaydediyoruz
+    }
+  }, []);
 
   const handleClaim = () => {
     const claimAmount = parseFloat(amount as any);
@@ -28,31 +43,40 @@ const ClaimScreen: React.FC<ClaimScreenProps> = ({route, navigation}) => {
     navigation.navigate('ClaimSuccess', {amount: claimAmount});
   };
 
+  // Haptic Feedback ve Sesli Geri Bildirim
+  const handleVibrateAndSpeak = (message: string) => {
+    HapticFeedback.trigger('impactLight'); // Haptic feedback tetikleniyor
+    speak(message); // Sesli geri bildirim
+  };
+
   return (
     <SafeAreaView style={styles.container}>
-      <Text style={styles.header} onLongPress={() => speak('Claim Your Funds')}>
+      <Text
+        style={styles.header}
+        onLongPress={() => handleVibrateAndSpeak('Claim Your Funds')}>
         Claim Your Funds
       </Text>
 
-      <TouchableWithoutFeedback
-        onLongPress={() => speak('Your Wallet Address 1234abc...xyz')}>
-        <View style={styles.inputContainer}>
-          <TextInput
-            placeholder="Your Wallet Address"
-            placeholderTextColor="#999"
-            style={styles.input}
-            defaultValue="1234abc...xyz"
-          />
-        </View>
-      </TouchableWithoutFeedback>
+      <View style={styles.inputContainer}>
+        <TextInput
+          placeholder="Your Wallet Address"
+          placeholderTextColor="#999"
+          style={styles.input}
+          value={privateKey} // App.tsx'deki private key burada gösteriliyor
+          editable={false} // Kullanıcı tarafından düzenlenemeyecek
+          onFocus={() => speak(`Your Wallet Address is ${privateKey}`)} // Sesli geri bildirim
+        />
+      </View>
 
       <View style={styles.amountContainer}>
-        <Text style={styles.amountLabel} onLongPress={() => speak('Amount')}>
+        <Text
+          style={styles.amountLabel}
+          onLongPress={() => handleVibrateAndSpeak('Amount')}>
           Amount:
         </Text>
         <Text
           style={styles.amountValue}
-          onLongPress={() => speak(`Amount is ${amount}`)}>
+          onLongPress={() => handleVibrateAndSpeak(`Amount is ${amount}`)}>
           ${amount}
         </Text>
       </View>
@@ -60,7 +84,7 @@ const ClaimScreen: React.FC<ClaimScreenProps> = ({route, navigation}) => {
       <TouchableOpacity
         style={styles.claimButton}
         onPress={handleClaim}
-        onLongPress={() => speak('Claim')}>
+        onLongPress={() => handleVibrateAndSpeak('Claim')}>
         <Text style={styles.claimButtonText}>CLAIM</Text>
       </TouchableOpacity>
     </SafeAreaView>

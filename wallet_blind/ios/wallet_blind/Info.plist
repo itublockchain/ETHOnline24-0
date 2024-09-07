@@ -5,7 +5,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleDisplayName</key>
-	<string>wallet_blind</string>
+	<string>Domino</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -20,8 +20,6 @@
 	<string>$(MARKETING_VERSION)</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
-
-	<!-- URL Types for Deep Linking -->
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>
@@ -31,23 +29,14 @@
 			<string>wallet_blind</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>myapp</string> <!-- Replace with your custom scheme -->
+				<string>myapp</string>
 			</array>
 		</dict>
 	</array>
-
-	<!-- Deep Link Support -->
-	<key>LSApplicationQueriesSchemes</key>
-	<array>
-		<string>myapp</string>
-	</array>
-
 	<key>CFBundleVersion</key>
 	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
-
-	<!-- Network Permissions -->
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSAllowsArbitraryLoads</key>
@@ -55,29 +44,26 @@
 		<key>NSAllowsLocalNetworking</key>
 		<true/>
 	</dict>
-
-	<!-- Location Access Permission (If needed) -->
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>We need your location to improve the app experience</string>
-
-	<!-- Launch Screen -->
+	<string>This app needs location access to provide location-based services.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Your app requires microphone access for voice input functionality.</string>
+	<key>NSSiriUsageDescription</key>
+	<string>Bu uygulama Siri kısayollarıyla belirli işlemleri gerçekleştirebilmenizi sağlar.</string>
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>Your app requires access to speech recognition for voice feedback.</string>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
-
-	<!-- Device Capabilities -->
 	<key>UIRequiredDeviceCapabilities</key>
 	<array>
 		<string>arm64</string>
 	</array>
-
-	<!-- Supported Orientations -->
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
-
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
 </dict>
