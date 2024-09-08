@@ -1,0 +1,5 @@
+DominoWallet was created to provide the smoothest experience for visually impaired users. This was achieved by enabling voice-activated transfers and ensuring full accessibility throughout the application. While developing the app, we utilized Lit Protocol's 'Sign with Action' feature, XMTP's in-app notifications, and Envion's blockscanner data integration capabilities.
+
+How It Works:
+
+First, the user creates an account and funds it through transfers. Once the account is ready, they can transfer money using voice commands. The process starts when the user gives a voice command to Siri, which must include the transfer amount and the recipient’s address. Siri then activates the phone, and the app opens. Using Lit Protocol’s "Sign with Action" feature, the transaction is signed through the voice input. A unique claim link is generated and sent to the recipient via a notification using XMTP. The transaction amount is held in the app’s pool. When the recipient opens the link, they are directed to the pool to claim the transferred funds. Finally, the transaction details are stored within the app using Envio's services.
