@@ -29,14 +29,14 @@ const WalletScreen: React.FC<WalletScreenProps> = ({navigation}) => {
   };
 
   useEffect(() => {
-    //navigation.navigate('SendMoney', {});
+    navigation.navigate('SendMoney', {});
   }, [navigation]);
 
   return (
     <SafeAreaView style={[styles.container, {backgroundColor: '#632CA9'}]}>
       <View style={styles.header}>
         <Image
-          source={require('../assets/logo.jpeg')}
+          source={require('../assets/logo.png')}
           style={styles.logoImage}
         />
 

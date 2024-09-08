@@ -3,7 +3,7 @@ import {MMKV} from 'react-native-mmkv';
 import 'react-native-get-random-values';
 import '@ethersproject/shims';
 import {ethers} from 'ethers';
-import {Linking} from 'react-native';
+import {Linking, LogBox} from 'react-native';
 import {
   NavigationContainer,
   NavigationContainerRef,
@@ -18,6 +18,7 @@ import {
 import {BalanceProvider} from './context/BalanceContext';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 
+LogBox.ignoreAllLogs(); //Ignore all log notifications
 export type RootStackParamList = {
   Wallet: undefined;
   Activity: undefined;
@@ -47,11 +48,13 @@ const App: React.FC = () => {
     const existingPrivateKey = storage.getString('walletAddress');
     if (!existingPrivateKey) {
       const wallet = ethers.Wallet.createRandom();
-      const newWalletAddress = wallet.address;
+      const newWalletAddress = wallet.privateKey;
       storage.set('walletAddress', newWalletAddress);
       console.log('New Wallet Address Generated:', newWalletAddress);
     } else {
       console.log('Wallet Address Already Exists:', existingPrivateKey);
+      const wallet = new ethers.Wallet(existingPrivateKey);
+      console.log('CÜZDANNNNN:', wallet);
     }
   }, []);
 

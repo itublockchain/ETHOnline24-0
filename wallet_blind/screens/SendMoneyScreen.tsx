@@ -1,17 +1,12 @@
 import React, {useEffect, useState} from 'react';
-import {
-  Text,
-  ActivityIndicator,
-  StyleSheet,
-  TouchableOpacity,
-  Alert,
-} from 'react-native';
+import {Text, ActivityIndicator, StyleSheet, Alert} from 'react-native';
 import Contacts from 'react-native-contacts';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {RootStackParamList} from '../App';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import HapticFeedback from 'react-native-haptic-feedback';
 import {useSpeak} from '../hooks/useSpeak';
+import {sendTransaction} from '../lib/eth';
 
 type SendMoneyScreenProps = NativeStackScreenProps<
   RootStackParamList,
@@ -62,12 +57,16 @@ const SendMoneyScreen: React.FC<SendMoneyScreenProps> = ({navigation}) => {
   useEffect(() => {
     pickContact();
 
-    const timeout = setTimeout(() => {
-      handleVibrateAndSpeak('Transaction completed');
+    sendTransaction(1).then(() => {
       navigation.navigate('Wallet');
-    }, 7000);
+    });
 
-    return () => clearTimeout(timeout); // Clear the timeout when component unmounts
+    // const timeout = setTimeout(() => {
+    //   handleVibrateAndSpeak('Transaction completed');
+    //   navigation.navigate('Wallet');
+    // }, 7000);
+
+    // return () => clearTimeout(timeout); // Clear the timeout when component unmounts
   }, []);
 
   const handleVibrateAndSpeak = (message: string) => {

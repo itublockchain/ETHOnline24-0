@@ -124,7 +124,11 @@ const ClaimScreen: React.FC<ClaimScreenProps> = ({route, navigation}) => {
 
       {isClaimed && (
         <Animated.View style={[styles.successMessage, {opacity: fadeAnim}]}>
-          <Text style={styles.successText}>
+          <Text
+            style={styles.successText}
+            numberOfLines={1}
+            adjustsFontSizeToFit={true}
+            ellipsizeMode="tail">
             Successfully claimed {amount} dollars!
           </Text>
           <Text style={styles.successText}>✓</Text>
